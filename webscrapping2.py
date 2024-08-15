@@ -26,7 +26,7 @@ from nltk.tokenize import word_tokenize
 import string
 from nltk.stem import PorterStemmer
 nltk.download('punkt')
-
+nltk.download('stopwords')
 # In[2]:
 
 
