@@ -1,33 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# <h1>Table of Contents<span class="tocSkip"></span></h1>
-# <div class="toc"><ul class="toc-item"></ul></div>
-
-# In[1]:
-
-
-
-
-
-
-
-
-
 import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 import requests
 from bs4 import BeautifulSoup
 import html
 import time
 import pandas as pd
-
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import string
 from nltk.stem import PorterStemmer
 nltk.download('punkt')
 nltk.download('stopwords')
-# In[2]:
+nltk.download('vader_lexicon')
+
 
 
 def getPageComments(pageNumber):
@@ -105,32 +90,10 @@ print(allComments)
 print(len(allComments))
 
 
-# In[3]:
 
 
 df = pd.DataFrame(allComments)
-df
 
-
-# In[4]:
-
-
-df.info()
-
-
-# In[5]:
-
-
-df.isnull().sum()
-
-
-# In[6]:
-
-
-#df.to_csv('walmart_reviews.csv', index=False)
-
-
-# In[7]:
 
 
 def preprocess_text(text):
@@ -155,67 +118,24 @@ def preprocess_text(text):
     return ' '.join(tokens)
 
 
-# In[8]:
-
-
-df.columns
-
-
-# In[9]:
-
-
 df['cleaned_review'] = df['review'].apply(preprocess_text)
-df
 
 
-# In[10]:
-
-
-from nltk.sentiment import SentimentIntensityAnalyzer
 
 # Initialize the VADER sentiment analyzer
 sia = SentimentIntensityAnalyzer()
 
 
-# In[11]:
-
-
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-
-# Download the VADER lexicon
-#nltk.download('vader_lexicon')
-
-# Initialize the VADER sentiment analyzer
-sia = SentimentIntensityAnalyzer()
 
 # Define a function to analyze sentiment
 def analyze_sentiment(text):
     sentiment_scores = sia.polarity_scores(text)
     return sentiment_scores
 
-# Example usage with a sample review
-sample_review = "The product is excellent and works perfectly!"
-print(analyze_sentiment(sample_review))
-
-
-# In[12]:
-
-
-#pd.set_option('display.max_colwidth', None)
-
-
-# In[13]:
-
 
 df['sentiment'] = df['cleaned_review'].apply(analyze_sentiment)
-df
 
 
-# In[14]:
-
-
-# Function to categorize sentiment based on both star rating and compound score
 def categorize_sentiment(row):
     compound_score = row['sentiment']['compound']  # Access the compound score
     star_rating = row['star']  # Access the star rating
@@ -234,6 +154,7 @@ def categorize_sentiment(row):
         else:
             return 'Negative'
 
+
 # Apply categorization to each row in the DataFrame
 df['sentiment_label'] = df.apply(categorize_sentiment, axis=1)
 
@@ -241,19 +162,10 @@ df['sentiment_label'] = df.apply(categorize_sentiment, axis=1)
 print(df[['cleaned_review', 'sentiment', 'sentiment_label']].head())
 
 
-# In[15]:
 
 
-df
 
 
-# In[17]:
-
-
-#pip install streamlit
-
-
-#
 
 
 
