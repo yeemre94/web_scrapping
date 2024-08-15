@@ -9,7 +9,7 @@ ipykernel==6.29.5
 ipython==8.26.0
 itsdangerous==2.2.0
 MarkupSafe==2.1.5
-nltk==3.8.2
+nltk==3.8
 numpy==2.0.1
 pandas==2.2.2
 prompt_toolkit==3.0.47
