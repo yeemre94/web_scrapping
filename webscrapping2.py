@@ -1,4 +1,4 @@
-pip install selenium
+
 
 import streamlit as st
 import nltk
