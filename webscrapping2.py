@@ -17,20 +17,18 @@ nltk.download('vader_lexicon')
 # Initialize the sentiment analyzer
 sia = SentimentIntensityAnalyzer()
 
-# Function to get comments from a URL (You can adapt this to different URLs)
+# Function to get comments from a URL
 def get_page_comments(url):
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
     
-    # Modify this part based on the specific structure of the page
-    # Assuming comments are within a certain class or tag
     comments = []
-    for review in soup.find_all('div', class_='your-comment-class'):
-        # Extract date, rating, and comment text
-        date = review.find('span', class_='date-class').text
-        star = int(review.find('span', class_='star-class').text)
-        text = review.find('p', class_='comment-class').text
+    # Modify this to target the correct elements in the Walmart review section
+    for review in soup.find_all('div', class_='w_DHV_ pv3 mv1'):
+        date = review.find('div', class_='f7 gray mt1').text if review.find('div', class_='f7 gray mt1') else "No date"
+        star = int(review.find('span', class_='w_iUH7').text.split()[0]) if review.find('span', class_='w_iUH7') else 0
+        text = review.find('b').text if review.find('b') else "No review"
         comments.append({"date": date, "star": star, "review": html.unescape(text)})
     
     return comments
@@ -51,8 +49,8 @@ def analyze_sentiment(text):
 # Streamlit UI
 st.title("URL-based Sentiment Analysis")
 
-# Input for URL
-url_input = st.text_input("Enter the URL for sentiment analysis", "https://example.com")
+# Input for URL with default value
+url_input = st.text_input("Enter the URL for sentiment analysis", "https://www.walmart.com/seller/17602?page=1")
 
 if st.button("Analyze"):
     if url_input:
