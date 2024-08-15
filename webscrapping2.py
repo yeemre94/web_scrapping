@@ -1,13 +1,17 @@
 import streamlit as st
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 import html
 import pandas as pd
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
+import time
 
 # Download NLTK resources
 nltk.download('punkt')
@@ -17,14 +21,22 @@ nltk.download('vader_lexicon')
 # Initialize the sentiment analyzer
 sia = SentimentIntensityAnalyzer()
 
-# Function to get comments from a URL
+# Function to get comments from a URL using Selenium
 def get_page_comments(url):
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.content, "html.parser")
-    
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode (without a UI)
+    chrome_service = Service('D:\Downloads\chromedriver-win64\chromedriver.exe')  # Replace with the path to your chromedriver
+
+    # Initialize the WebDriver
+    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+    driver.get(url)
+    time.sleep(3)  # Allow the page to load
+
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver.quit()
+
+    # Extracting reviews
     comments = []
-    # Modify this to target the correct elements in the Walmart review section
     for review in soup.find_all('div', class_='w_DHV_ pv3 mv1'):
         date = review.find('div', class_='f7 gray mt1').text if review.find('div', class_='f7 gray mt1') else "No date"
         star = int(review.find('span', class_='w_iUH7').text.split()[0]) if review.find('span', class_='w_iUH7') else 0
